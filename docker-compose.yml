@@ -1,0 +1,9 @@
+services:
+  ftp-server:
+    environment:
+      - USERS=foo|pass
+      - ADDRESS=localhost
+    image: delfer/alpine-ftp-server
+    network_mode: host
+    volumes:
+      - './data:/data'

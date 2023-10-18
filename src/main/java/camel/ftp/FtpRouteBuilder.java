@@ -15,15 +15,12 @@ public class FtpRouteBuilder extends RouteBuilder {
 
         from("{{ftp.input}}")
                 .unmarshal().csv()
+                .filter(simple("${header.CamelFileNameOnly}").startsWith("waybill"))
+                .filter(simple("${header.CamelFileNameOnly}").endsWith(".csv"))
                 .to("bean:fileTransformation")
                 .marshal().json(JsonLibrary.Jackson)
-                .process(e -> {
-                    String fileName = e.getIn().getHeader("CamelFileNameOnly").toString();
-                    fileName = fileName.replace(".csv", ".test.json");
-                    e.getIn().setHeader("fileName", fileName);
-                })
-//                .setHeader("fileName", header("CamelFileNameOnly").method(""))
-                .log("${body}")
-                .to("{{ftp.output}}" + "&fileName=${header.fileName}.json");
+                .process(new HeaderProcessor())
+                .log("${header.fileName}")
+                .to("{{ftp.output}}" + "&fileName=${header.fileName}");
     }
 }
