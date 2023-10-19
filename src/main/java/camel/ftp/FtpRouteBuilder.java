@@ -1,6 +1,7 @@
 package camel.ftp;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.dataformat.csv.CsvDataFormat;
 import org.apache.camel.model.dataformat.JsonLibrary;
 
 public class FtpRouteBuilder extends RouteBuilder {
@@ -13,11 +14,12 @@ public class FtpRouteBuilder extends RouteBuilder {
         // lets shutdown faster in case of in-flight messages stack up
         getContext().getShutdownStrategy().setTimeout(10);
 
+        var csv = new CsvDataFormat().setUseMaps(true);
+
         from("{{ftp.input}}")
-                .unmarshal().csv()
+                .unmarshal(csv)
                 .filter(simple("${header.CamelFileNameOnly}").startsWith("waybill"))
                 .filter(simple("${header.CamelFileNameOnly}").endsWith(".csv"))
-                .to("bean:fileTransformation")
                 .marshal().json(JsonLibrary.Jackson)
                 .process(new HeaderProcessor())
                 .log("${header.fileName}")

@@ -6,4 +6,5 @@ services:
     image: delfer/alpine-ftp-server
     network_mode: host
     volumes:
-      - './data:/data'
+      - './data/input:/data/input'
+      - './data/output:/data/output'
