@@ -2,7 +2,7 @@ package camel.ftp;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.dataformat.csv.CsvDataFormat;
-import org.apache.camel.model.dataformat.JsonLibrary;
+
 
 public class FtpRouteBuilder extends RouteBuilder {
 
@@ -17,12 +17,14 @@ public class FtpRouteBuilder extends RouteBuilder {
         var csv = new CsvDataFormat().setUseMaps(true);
 
         from("{{ftp.input}}")
+            .choice()
+                .when(simple("${header.CamelFileNameOnly}").endsWith(".csv"))
                 .unmarshal(csv)
-                .filter(simple("${header.CamelFileNameOnly}").startsWith("waybill"))
-                .filter(simple("${header.CamelFileNameOnly}").endsWith(".csv"))
-                .marshal().json(JsonLibrary.Jackson)
+                .to("bean:fileTransformation")
+                .marshal(csv.setSkipHeaderRecord(false))
                 .process(new HeaderProcessor())
-                .log("${header.fileName}")
-                .to("{{ftp.output}}" + "&fileName=${header.fileName}");
+                .to("{{ftp.output}}" + "&fileName=${header.fileName}")
+            .otherwise()
+                .to("{{ftp.fault}}" + "&fileName=${header.CamelFileNameOnly}");
     }
 }

@@ -16,7 +16,7 @@ class HeaderProcessor implements Processor {
         String[] fileNameSplit = fileName.split("-");
 
         if (fileNameSplit.length != 2) {
-            e.getIn().setHeader("fileName", fileName + ".json");
+            e.getIn().setHeader("fileName", fileName + ".csv");
             return;
         }
 
@@ -25,6 +25,6 @@ class HeaderProcessor implements Processor {
 
         Date date = inputFormat.parse(fileNameSplit[1]);
 
-        e.getIn().setHeader("fileName", String.format("invoice.%s.json", outputFormat.format(date)));
+        e.getIn().setHeader("fileName", String.format("invoice.%s.csv", outputFormat.format(date)));
     }
 }
