@@ -24,12 +24,10 @@ public final class CamelApplication {
 
             camelContext.getRegistry().bind("fileTransformation", FileTransformation.class);
 
+            //camelContext.addRoutes(new KafkaConsumerRoute());
             camelContext.addRoutes(new KafkaPublisherRoute());
-            camelContext.addRoutes(new KafkaConsumerRoute());
 
-            try (ProducerTemplate producerTemplate = camelContext.createProducerTemplate()) {
-                camelContext.start();
-            }
+            camelContext.start();
 
             Thread.sleep(5L * 60 * 1000);
         }
@@ -43,8 +41,11 @@ public final class CamelApplication {
         // setup kafka component with the brokers
         ComponentsBuilderFactory.kafka()
                 .brokers("{{kafka.brokers}}")
+                .groupId("{{consumer.group}}")
                 .keySerializer("io.confluent.kafka.serializers.KafkaAvroSerializer")
                 .valueSerializer("io.confluent.kafka.serializers.KafkaAvroSerializer")
+                .keyDeserializer("io.confluent.kafka.serializers.KafkaAvroDeserializer")
+                .valueDeserializer("io.confluent.kafka.serializers.KafkaAvroDeserializer")
                 .additionalProperties(additionalProps)
                 .register(camelContext, "kafka");
     }

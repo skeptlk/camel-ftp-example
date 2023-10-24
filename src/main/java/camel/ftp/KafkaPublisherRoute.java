@@ -10,22 +10,21 @@ public class KafkaPublisherRoute extends RouteBuilder {
         // configure properties component
         getContext().getPropertiesComponent().setLocation("classpath:ftp.properties");
 
-
         // lets shutdown faster in case of in-flight messages stack up
         getContext().getShutdownStrategy().setTimeout(10);
 
-        var csv = new CsvDataFormat().setUseMaps(true);
+        var csv = new CsvDataFormat().setUseMaps(true).setTrim(true);
 
         from("{{ftp.input}}")
             .choice()
                 .when(simple("${header.CamelFileNameOnly}").endsWith(".csv"))
                 .unmarshal(csv)
                 .to("bean:fileTransformation")
-                .marshal(csv.setSkipHeaderRecord(false))
                 // push to Kafka
                 .setHeader(KafkaConstants.PARTITION_KEY, simple("0"))
-                .setHeader(KafkaConstants.KEY, simple("${header.CamelFileNameOnly}"))
-                .to("kafka:{{producer.topic}}").log("${headers}")
+                .to("kafka:{{producer.topic}}")
+                .log("Writing to kafka!")
+                .log("${headers}")
             .otherwise()
                 .log("Wrong file in input directory: ${header.CamelFileNameOnly}")
                 .to("{{ftp.fault}}" + "&fileName=${header.CamelFileNameOnly}");

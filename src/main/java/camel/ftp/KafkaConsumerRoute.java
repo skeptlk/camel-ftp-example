@@ -8,6 +8,8 @@ public class KafkaConsumerRoute extends RouteBuilder {
         // configure properties component
         getContext().getPropertiesComponent().setLocation("classpath:ftp.properties");
 
+        getContext().getShutdownStrategy().setTimeout(10);
+
         from("kafka:{{consumer.topic}}").log("Consumed message::: ${body}");
     }
 }

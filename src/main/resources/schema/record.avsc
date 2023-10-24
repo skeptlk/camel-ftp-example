@@ -1,0 +1,26 @@
+{
+  "type": "record",
+  "name": "FlightRecord",
+  "fields": [
+    {
+      "name": "flight",
+      "type": "string"
+    },
+    {
+      "name": "company",
+      "type": "string"
+    },
+    {
+      "name": "time",
+      "type": "string"
+    },
+    {
+      "name": "arr",
+      "type": "string"
+    },
+    {
+      "name": "dep",
+      "type": "string"
+    }
+  ]
+}
