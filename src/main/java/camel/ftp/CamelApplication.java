@@ -1,11 +1,11 @@
 package camel.ftp;
 
-import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.camel.CamelContext;
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.component.ComponentsBuilderFactory;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.commons.dbcp2.BasicDataSource;
 
+import javax.sql.DataSource;
 import java.util.HashMap;
 
 /**
@@ -16,16 +16,19 @@ public final class CamelApplication {
     }
 
     public static void main(String[] args) throws Exception {
-        // use Camels Main class
         try (CamelContext camelContext = new DefaultCamelContext()) {
             camelContext.getPropertiesComponent().setLocation("classpath:ftp.properties");
 
             setUpKafkaComponent(camelContext);
 
+            DataSource postgresDS = setupPostgresDataSource("jdbc:postgresql://localhost:5432/postgres");
+
+            camelContext.getRegistry().bind("postgres", postgresDS);
+
             camelContext.getRegistry().bind("fileTransformation", FileTransformation.class);
 
-            //camelContext.addRoutes(new KafkaConsumerRoute());
             camelContext.addRoutes(new KafkaPublisherRoute());
+            camelContext.addRoutes(new KafkaConsumerRoute());
 
             camelContext.start();
 
@@ -38,6 +41,7 @@ public final class CamelApplication {
             put("schema.registry.url", "http://localhost:8081");
         }};
 
+
         // setup kafka component with the brokers
         ComponentsBuilderFactory.kafka()
                 .brokers("{{kafka.brokers}}")
@@ -49,4 +53,15 @@ public final class CamelApplication {
                 .additionalProperties(additionalProps)
                 .register(camelContext, "kafka");
     }
+
+    private static DataSource setupPostgresDataSource(String connectURI) {
+        return new BasicDataSource() {{
+            setDriverClassName("org.postgresql.Driver");
+            setUsername("foo");
+            setPassword("pass");
+            setUrl(connectURI);
+        }};
+    }
+
+
 }

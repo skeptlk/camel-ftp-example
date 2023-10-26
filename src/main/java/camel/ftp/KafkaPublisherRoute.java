@@ -8,7 +8,6 @@ public class KafkaPublisherRoute extends RouteBuilder {
     public void configure() throws Exception {
         // configure properties component
         getContext().getPropertiesComponent().setLocation("classpath:ftp.properties");
-
         // lets shutdown faster in case of in-flight messages stack up
         getContext().getShutdownStrategy().setTimeout(10);
 
@@ -20,8 +19,7 @@ public class KafkaPublisherRoute extends RouteBuilder {
                 .unmarshal(csv)
                 .to("bean:fileTransformation")
                 .to("kafka:{{producer.topic}}")
-                .log("Writing to kafka!")
-                .log("${headers}")
+                .log("Writing csv to kafka!")
             .otherwise()
                 .log("Wrong file in input directory: ${header.CamelFileNameOnly}")
                 .to("{{ftp.fault}}" + "&fileName=${header.CamelFileNameOnly}");
