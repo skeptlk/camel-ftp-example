@@ -1,6 +1,5 @@
 package camel.ftp;
 
-import camel.ftp.model.FlightRecord;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 
@@ -14,10 +13,9 @@ public class FileTransformation {
             .stream()
             //.filter(map -> Objects.equals(map.get("company"), "s7"))
             .map(hashMap -> {
-                var flightRecord = new FlightRecord(hashMap);
                 var parser = new Schema.Parser();
 
-                Schema schema = null;
+                Schema schema;
                 try {
                     var file = getClass().getClassLoader().getResourceAsStream("schema/record.avsc");
                     schema = parser.parse(file);
@@ -26,11 +24,11 @@ public class FileTransformation {
                 }
 
                 var record = new GenericData.Record(schema);
-                record.put("flight", flightRecord.flight);
-                record.put("time", flightRecord.time);
-                record.put("company", flightRecord.company);
-                record.put("arr", flightRecord.arr);
-                record.put("dep", flightRecord.dep);
+                record.put("flight", hashMap.get("flight"));
+                record.put("time", hashMap.get("time"));
+                record.put("company", hashMap.get("company"));
+                record.put("arr", hashMap.get("arr"));
+                record.put("dep", hashMap.get("dep"));
                 return record;
             })
             .toList();

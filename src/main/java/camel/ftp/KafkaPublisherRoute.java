@@ -1,7 +1,6 @@
 package camel.ftp;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.kafka.KafkaConstants;
 import org.apache.camel.dataformat.csv.CsvDataFormat;
 
 public class KafkaPublisherRoute extends RouteBuilder {
@@ -20,8 +19,6 @@ public class KafkaPublisherRoute extends RouteBuilder {
                 .when(simple("${header.CamelFileNameOnly}").endsWith(".csv"))
                 .unmarshal(csv)
                 .to("bean:fileTransformation")
-                // push to Kafka
-                .setHeader(KafkaConstants.PARTITION_KEY, simple("0"))
                 .to("kafka:{{producer.topic}}")
                 .log("Writing to kafka!")
                 .log("${headers}")
