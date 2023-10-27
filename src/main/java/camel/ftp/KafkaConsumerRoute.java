@@ -22,7 +22,7 @@ public class KafkaConsumerRoute extends RouteBuilder {
                             body.get("dep"));
                     exchange.getMessage().setBody(query);
                 })
-                .to("jdbc:postgres")
-                .log("Pushed to postgres");
-    }
+        .to("jdbc:postgres")
+        .log("Pushed to postgres");
+        }
 }
