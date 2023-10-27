@@ -11,7 +11,6 @@ public class KafkaPublisherRoute extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         // configure properties component
-        getContext().getPropertiesComponent().setLocation("classpath:ftp.properties");
         // lets shutdown faster in case of in-flight messages stack up
         getContext().getShutdownStrategy().setTimeout(10);
 

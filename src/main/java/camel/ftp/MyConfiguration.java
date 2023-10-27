@@ -1,13 +1,11 @@
 package camel.ftp;
 
 import org.apache.camel.BindToRegistry;
-import org.apache.camel.CamelContext;
 import org.apache.camel.Configuration;
-import org.apache.camel.builder.component.ComponentsBuilderFactory;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import javax.sql.DataSource;
-import java.util.HashMap;
+
 
 @Configuration
 public class MyConfiguration {
@@ -15,7 +13,6 @@ public class MyConfiguration {
     public FileTransformation fileTransformation() {
         return  new FileTransformation();
     }
-
 
     @BindToRegistry
     public DataSource postgres() {
